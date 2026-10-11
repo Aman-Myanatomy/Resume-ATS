@@ -1,0 +1,25 @@
+{
+  "name": "prompt-engineering-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Small live-coding demo project for a 3-hour prompt engineering session (Gemini).",
+  "scripts": {
+    "start": "node index.js",
+    "check": "node 00-check-setup.js",
+    "01": "node 01-naive-prompt.js",
+    "02": "node 02-system-vs-user.js",
+    "03": "node 03-structured-output.js",
+    "04": "node 04-rubric-scoring.js",
+    "05": "node 05-hidden-cot.js",
+    "06": "node 06-injection-attack.js",
+    "06b": "node 06b-injection-defended.js",
+    "07": "node 07-temperature-demo.js",
+    "08": "node 08-fallback-chain-demo.js",
+    "08b": "node 08b-orchestration-fatal-error.js"
+  },
+  "dependencies": {
+    "@google/genai": "^2.24.0",
+    "dotenv": "^16.4.5"
+  }
+}

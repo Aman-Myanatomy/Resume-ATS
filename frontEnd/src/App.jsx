@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthScreen from './components/AuthScreen.jsx';
 import Dashboard from './components/Dashboard.jsx';
-import { analyzeResume, authenticate } from './services/api.js';
-import { setSession, clearSession } from './store/authSlice.js';
-import { analysisStarted, analysisSucceeded, analysisFailed } from './store/analysisSlice.js';
+import { signupUser, loginUser, clearSession } from './store/slices/auth.slices.js';
+import { analyzeResume } from './store/slices/analysis.slices.js';
 
 export default function App() {
   const dispatch = useDispatch();
-  const user = useSelector(state => state.auth.user);
-  const analysisState = useSelector(state => state.analysis);
+  const { user, loading: authLoading, error: authError } = useSelector(state => state.auth);
+  const { result: analysis, loading: analysisLoading, error: analysisError } = useSelector(state => state.analysis);
+
   const [authMode, setAuthMode] = useState('signup');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -17,79 +17,87 @@ export default function App() {
   const [resume, setResume] = useState('');
   const [job, setJob] = useState('');
   const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('analyze');
+  const [localError, setLocalError] = useState('');
+
+  const displayError = localError || authError || analysisError || '';
+  const isLoading = authLoading || analysisLoading;
 
   async function handleAuthentication(event) {
     event.preventDefault();
-    setError('');
+    setLocalError('');
+
     try {
-      const data = await authenticate(authMode, { name, email, password });
-      const session = { ...data.user, token: data.token };
-      dispatch(setSession(session));
-    } catch (requestError) { setError(requestError.message); }
+      if (authMode === 'signup') {
+        await dispatch(signupUser({ name, email, password })).unwrap();
+      } else {
+        await dispatch(loginUser({ email, password })).unwrap();
+      }
+    } catch (err) {
+      // Handled via Redux state rejection or unwrap
+      setLocalError(typeof err === 'string' ? err : err.message || 'Authentication failed.');
+    }
   }
 
   async function handleAnalysis() {
-    if (!resume.trim() && !file) return setError('Paste your resume or upload a file to begin.');
-    setLoading(true);
-    dispatch(analysisStarted());
-    setError('');
+    if (!resume.trim() && !file) {
+      setLocalError('Paste your resume or upload a file to begin.');
+      return;
+    }
+
+    setLocalError('');
+
     try {
-      const data = await analyzeResume(user.token, resume, job, file);
-      dispatch(analysisSucceeded(data));
+      await dispatch(
+        analyzeResume({
+          resume,
+          jobDescription: job,
+          file
+        })
+      ).unwrap();
+
       setActiveTab('results');
-    } catch (requestError) {
-      if (requestError.status === 401) {
-        dispatch(clearSession());
-      }
-      dispatch(analysisFailed(requestError.message));
-      setError(requestError.message);
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      setLocalError(typeof err === 'string' ? err : err.message || 'Analysis failed.');
     }
   }
 
   if (!user) {
     return (
       <AuthScreen
-        {...{
-          authMode,
-          setAuthMode,
-          name,
-          setName,
-          email,
-          setEmail,
-          password,
-          setPassword,
-          authenticate: handleAuthentication,
-          error,
-          setError
-        }}
+        authMode={authMode}
+        setAuthMode={setAuthMode}
+        name={name}
+        setName={setName}
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        authenticate={handleAuthentication}
+        error={displayError}
+        setError={setLocalError}
+        loading={isLoading}
       />
     );
   }
 
   return (
     <Dashboard
-      {...{
-        user,
-        setUser: () => dispatch(clearSession()),
-        activeTab,
-        setActiveTab,
-        resume,
-        setResume,
-        job,
-        setJob,
-        file,
-        setFile,
-        analysis: analysisState.result,
-        loading,
-        error,
-        setError,
-        analyze: handleAnalysis
-      }}
+      user={user}
+      setUser={() => dispatch(clearSession())}
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      resume={resume}
+      setResume={setResume}
+      job={job}
+      setJob={setJob}
+      file={file}
+      setFile={setFile}
+      analysis={analysis}
+      loading={isLoading}
+      error={displayError}
+      setError={setLocalError}
+      analyze={handleAnalysis}
     />
   );
 }

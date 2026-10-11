@@ -4,8 +4,8 @@ import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 
-import User from '../models/User.js';
-import Analysis from '../models/Analysis.js';
+import User from '../models/user.models.js';
+import Analysis from '../models/analysis.models.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '..', '.env') });

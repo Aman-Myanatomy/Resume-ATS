@@ -1,0 +1,21 @@
+Priya Sharma
+priya.sharma@email.com | +91-98765-43210 | Bengaluru, India
+
+Summary
+Frontend developer with 3 years of experience building React applications for e-commerce clients.
+
+Experience
+Frontend Developer, ShopEasy Pvt Ltd (2022 - Present)
+- Rebuilt the checkout flow in React, reducing page load time by 40% (2.1s to 1.3s)
+- Led migration of 12 legacy jQuery pages to React components
+- Mentored 2 junior developers on component testing with Jest
+
+Junior Developer, WebNest Solutions (2021 - 2022)
+- Built responsive landing pages for 8 client campaigns using HTML, CSS, and vanilla JS
+- Fixed cross-browser bugs reported through the internal QA tracker
+
+Skills
+React, JavaScript (ES6+), HTML5, CSS3, Jest, Git, REST APIs, Figma
+
+Education
+B.Tech in Computer Science, XYZ University (2017 - 2021)

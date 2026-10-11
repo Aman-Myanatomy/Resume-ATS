@@ -1,7 +1,9 @@
-import { cloudinary, cloudinaryConfigured } from '../config/cloudinary.js';
+import { cloudinary, cloudinaryConfigured } from '../config/cloudinary.config.js';
 
-export function uploadResume(file) {
-  if (!file || !cloudinaryConfigured) return Promise.resolve(null);
+export async function uploadResume(file) {
+  if (!file || !cloudinaryConfigured) {
+    return null;
+  }
 
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -16,7 +18,11 @@ export function uploadResume(file) {
       },
       (error, result) => {
         if (error) return reject(error);
-        resolve({ publicId: result.public_id, url: result.secure_url, resourceType: result.resource_type });
+        resolve({
+          publicId: result.public_id,
+          url: result.secure_url,
+          resourceType: result.resource_type
+        });
       }
     );
     stream.end(file.buffer);
