@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { authenticateApi } from '../../services/api.services.js';
+import { authenticateApi, getMeApi } from '../../services/api.services.js';
 
 function getStoredSession() {
   try {
@@ -14,9 +14,9 @@ function getStoredSession() {
  */
 export const signupUser = createAsyncThunk(
   'auth/signupUser',
-  async ({ name, email, password }, { rejectWithValue }) => {
+  async ({ name, email, password, role = 'candidate', companyName }, { rejectWithValue }) => {
     try {
-      const data = await authenticateApi('signup', { name, email, password });
+      const data = await authenticateApi('signup', { name, email, password, role, companyName });
       const session = { ...data.user, token: data.token };
       localStorage.setItem('resumely_user', JSON.stringify(session));
       return session;
@@ -43,8 +43,29 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+/**
+ * Async Thunk that re-reads the signed-in user (role, company) from the server.
+ * Sessions saved before roles existed get upgraded silently on app load.
+ */
+export const refreshSession = createAsyncThunk(
+  'auth/refreshSession',
+  async (_, { getState, rejectWithValue }) => {
+    const token = getState().auth.user?.token;
+    if (!token) return rejectWithValue('No session.');
+    try {
+      const data = await getMeApi(token);
+      const session = { ...data.user, token: data.token };
+      localStorage.setItem('resumely_user', JSON.stringify(session));
+      return session;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = {
   user: getStoredSession(),
+  signedOut: false,
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
   loading: false,
   error: null
@@ -67,7 +88,23 @@ const authSlice = createSlice({
       state.error = null;
       try {
         localStorage.removeItem('resumely_user');
+        localStorage.removeItem('resumely_analysis');
       } catch {}
+    },
+    // Deliberate sign-out (vs. an expired session): protected pages send the user to /jobs, not /login.
+    signOut: (state) => {
+      state.user = null;
+      state.status = 'idle';
+      state.loading = false;
+      state.error = null;
+      state.signedOut = true;
+      try {
+        localStorage.removeItem('resumely_user');
+        localStorage.removeItem('resumely_analysis');
+      } catch {}
+    },
+    signOutHandled: (state) => {
+      state.signedOut = false;
     },
     clearAuthError: (state) => {
       state.error = null;
@@ -82,6 +119,7 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(signupUser.fulfilled, (state, action) => {
+        state.signedOut = false;
         state.status = 'succeeded';
         state.loading = false;
         state.user = action.payload;
@@ -99,6 +137,7 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
+        state.signedOut = false;
         state.status = 'succeeded';
         state.loading = false;
         state.user = action.payload;
@@ -108,10 +147,14 @@ const authSlice = createSlice({
         state.status = 'failed';
         state.loading = false;
         state.error = action.payload || 'Failed to log in.';
+      })
+      // Refresh (silent: never shows a spinner or error)
+      .addCase(refreshSession.fulfilled, (state, action) => {
+        if (state.user) state.user = action.payload;
       });
   }
 });
 
-export const { setSession, clearSession, clearAuthError } = authSlice.actions;
+export const { setSession, clearSession, signOut, signOutHandled, clearAuthError } = authSlice.actions;
 export default authSlice.reducer;
 

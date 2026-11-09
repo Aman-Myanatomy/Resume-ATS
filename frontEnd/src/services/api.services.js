@@ -1,6 +1,15 @@
-const API_BASE = (typeof window !== 'undefined' && window.location.port === '3000')
-  ? `${window.location.protocol}//${window.location.hostname}:4000`
-  : '';
+import { API_BASE } from './config.js';
+
+/**
+ * Plain fetch helpers used by the auth and resume-analyzer thunks (createAsyncThunk).
+ * Everything else (jobs, pipeline, team, billing…) goes through RTK Query in store/api/.
+ */
+
+// Set once from index.js so any 401 signs the user out.
+let onUnauthorized = null;
+export function setUnauthorizedHandler(handler) {
+  onUnauthorized = handler;
+}
 
 async function request(path, options = {}) {
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
@@ -31,6 +40,7 @@ async function request(path, options = {}) {
   if (!response.ok) {
     const error = new Error(data.error || 'Request failed.');
     error.status = response.status;
+    if (response.status === 401 && options.headers?.Authorization && onUnauthorized) onUnauthorized();
     throw error;
   }
 
@@ -45,13 +55,13 @@ export async function authenticateApi(mode, credentials) {
   });
 }
 
+export const getMeApi = token => request('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+
 export async function analyzeResumeApi(token, resume, jobDescription, file) {
   const body = new FormData();
   body.append('text', resume);
   body.append('jobDescription', jobDescription);
-  if (file) {
-    body.append('resume', file);
-  }
+  if (file) body.append('resume', file);
 
   return await request('/api/analyze', {
     method: 'POST',
@@ -61,16 +71,9 @@ export async function analyzeResumeApi(token, resume, jobDescription, file) {
 }
 
 export async function getAnalysesHistoryApi(token) {
-  return await request('/api/analyses', {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  return await request('/api/analyses', { headers: { Authorization: `Bearer ${token}` } });
 }
 
 export async function getAnalysisByIdApi(token, id) {
-  return await request(`/api/analyses/${id}`, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  return await request(`/api/analyses/${id}`, { headers: { Authorization: `Bearer ${token}` } });
 }
-

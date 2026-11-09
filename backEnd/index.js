@@ -1,16 +1,24 @@
+// Must be the first import: other modules (e.g. cloudinary.config.js) read process.env when imported.
+import 'dotenv/config';
 import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
+import mongoose from 'mongoose';
 
 import connectDB from './config/db.config.js';
 import { validateEnvironment } from './config/env.config.js';
 import { apiLimiter, securityHeaders } from './config/security.config.js';
 import { errorHandlerMiddleware } from './middlewares/error.middlewares.js';
 import apiRoutes from './routes/index.js';
+import { resumePendingScoring } from './services/scoring.services.js';
+import { ensureJobCodes } from './services/job.services.js';
 
-dotenv.config();
-connectDB();
 validateEnvironment();
+connectDB().then(() => {
+  if (mongoose.connection.readyState === 1) {
+    resumePendingScoring().catch(error => console.error('Could not re-queue pending scores:', error.message));
+    ensureJobCodes().catch(error => console.error('Could not assign job IDs:', error.message));
+  }
+});
 
 const app = express();
 app.set('trust proxy', 1);
@@ -47,12 +55,17 @@ app.use('/api', apiRoutes);
 app.get('/', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'Resumely ATS Enterprise REST API',
-    version: '1.0.0',
+    service: 'Resumely ATS + Job Board REST API',
+    version: '2.0.0',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     endpoints: {
       auth: '/api/auth',
       analyses: '/api/analyses',
-      analyze: '/api/analyze'
+      analyze: '/api/analyze',
+      jobs: '/api/jobs',
+      companies: '/api/companies/:slug',
+      candidate: '/api/me',
+      employer: '/api/employer'
     }
   });
 });

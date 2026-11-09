@@ -50,8 +50,8 @@
   gap: 12px;
   margin-bottom: 22px;
   flex-wrap: wrap;
-  background: #f2f7ef;
-  border: 1px solid #dbe7d7;
+  background: var(--tint);
+  border: 1px solid var(--line);
   padding: 10px 16px;
   border-radius: 8px;
 }
@@ -71,7 +71,7 @@
 
 .preset-chip {
   background: var(--surface);
-  border: 1px solid #c9d8c4;
+  border: 1px solid var(--line-strong);
   color: var(--ink);
   font-size: 11px;
   font-weight: 600;
@@ -82,21 +82,21 @@
 }
 
 .preset-chip:hover {
-  background: #e5f0df;
+  background: var(--tint);
   border-color: var(--green);
   transform: translateY(-1px);
 }
 
 .preset-chip.chip-active {
-  background: var(--green);
+  background: var(--brand);
   color: white;
   border-color: var(--green);
 }
 
 .preset-chip.chip-weak:hover {
-  background: #fef2f2;
-  border-color: #fca5a5;
-  color: #b91c1c;
+  background: var(--bad-bg);
+  border-color: var(--bad-line);
+  color: var(--bad);
 }
 
 .preset-chip.chip-clear {
@@ -106,8 +106,8 @@
 }
 
 .preset-chip.chip-clear:hover {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: var(--bad-bg);
+  color: var(--bad);
 }
 
 .input-grid {
@@ -154,7 +154,7 @@
 
 .dropzone {
   height: 180px;
-  border: 1px dashed #bac9ba;
+  border: 1px dashed var(--line-strong);
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -168,7 +168,7 @@
 .dropzone:hover,
 .dropzone-active {
   border-color: var(--green);
-  background: #f7faf3;
+  background: var(--field);
   transform: translateY(-2px);
 }
 
@@ -195,7 +195,7 @@
 
 .browse-button {
   margin-top: 13px;
-  background: var(--green);
+  background: var(--brand);
   color: #fff;
   padding: 8px 12px;
   border-radius: 4px;
@@ -206,7 +206,7 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #eef4e9;
+  background: var(--tint);
   color: var(--green);
   display: grid;
   place-items: center;
@@ -244,8 +244,8 @@
 }
 
 .clear-file-button:hover {
-  background: #fee2e2 !important;
-  color: #b91c1c !important;
+  background: var(--bad-bg) !important;
+  color: var(--bad) !important;
   transform: translateY(-1px);
 }
 
@@ -262,16 +262,16 @@
 .tip {
   display: flex;
   gap: 10px;
-  background: #fff9e5;
+  background: var(--warn-bg);
   padding: 13px;
   margin-top: 18px;
-  color: #755f25;
+  color: var(--warn);
   font-size: 12px;
   line-height: 1.45
 }
 
 .tip span {
-  color: #b08c24
+  color: var(--warn)
 }
 
 .tip p {
@@ -306,15 +306,15 @@
 }
 
 .badge-ok {
-  background: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+  background: var(--good-bg);
+  color: var(--good);
+  border: 1px solid var(--good-line);
 }
 
 .badge-warn {
-  background: #fffbeb;
-  color: #b45309;
-  border: 1px solid #fde68a;
+  background: var(--warn-bg);
+  color: var(--warn);
+  border: 1px solid var(--warn-line);
 }
 
 .badge-neutral {

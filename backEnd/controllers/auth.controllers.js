@@ -1,4 +1,4 @@
-import { registerUser, authenticateUser } from '../services/auth.services.js';
+import { registerUser, authenticateUser, getCurrentUser } from '../services/auth.services.js';
 
 /**
  * Auth Controller Layer
@@ -7,8 +7,8 @@ import { registerUser, authenticateUser } from '../services/auth.services.js';
 
 export async function signup(req, res, next) {
   try {
-    const { name, email, password } = req.body || {};
-    const result = await registerUser({ name, email, password });
+    const { name, email, password, role, companyName } = req.body || {};
+    const result = await registerUser({ name, email, password, role, companyName });
     res.status(201).json(result);
   } catch (error) {
     next(error);
@@ -25,3 +25,10 @@ export async function login(req, res, next) {
   }
 }
 
+export async function me(req, res, next) {
+  try {
+    res.json(await getCurrentUser(req.auth.sub));
+  } catch (error) {
+    next(error);
+  }
+}

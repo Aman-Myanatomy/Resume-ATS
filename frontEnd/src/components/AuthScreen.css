@@ -7,7 +7,7 @@
 
 .auth-art {
   padding: 38px 8%;
-  background: var(--green);
+  background: var(--brand);
   color: #f8faf4;
   display: flex;
   flex-direction: column;

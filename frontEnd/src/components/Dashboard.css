@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 250px 1fr;
-  animation: dashboard-enter .35s ease-out both;
+
 }
 
 .sidebar {
@@ -55,7 +55,7 @@
 }
 
 .sidebar nav button:hover {
-  background: #f5f7f2;
+  background: var(--paper);
   color: var(--ink)
 }
 
@@ -74,6 +74,7 @@
   height: 31px;
   border-radius: 50%;
   background: var(--yellow);
+  color: #17211d;
   display: grid;
   place-items: center;
   font-weight: 700
@@ -120,7 +121,7 @@
 .topbar {
   height: 75px;
   border-bottom: 1px solid var(--line);
-  padding: 0 5%;
+  padding: 0 var(--page-gutter);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -146,7 +147,7 @@
   letter-spacing: 1px;
   color: var(--green);
   font-weight: 700;
-  background: #e9f0e7;
+  background: var(--tint);
   padding: 7px 10px;
   border-radius: 3px;
 }
@@ -209,7 +210,7 @@
 }
 
 .sidebar nav button:hover {
-  background: #f5f7f2;
+  background: var(--paper);
   color: var(--ink)
 }
 

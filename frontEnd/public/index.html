@@ -5,7 +5,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f5f7f2" />
-  <title>Resumely | ATS intelligence</title>
+  <meta name="description" content="Resumely: the job board where every application arrives pre-scored. Candidates see their fit before applying; employers get a ranked, explained shortlist." />
+  <title>Resumely | AI-ranked hiring and jobs</title>
+  <script>
+    // Apply the saved theme before first paint so dark mode never flashes white.
+    (function () {
+      var theme = 'system';
+      try { theme = JSON.parse(localStorage.getItem('resumely_ui') || '{}').theme || 'system'; } catch (e) {}
+      var dark = theme === 'dark' || (theme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link

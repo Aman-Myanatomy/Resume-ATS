@@ -32,6 +32,13 @@ const analysisSchema = new mongoose.Schema(
       url: { type: String, trim: true },
       resourceType: { type: String, trim: true }
     },
+    // Set when the analysis is a "fit check" against a job on the board.
+    job: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Job'
+    },
+    jobVersion: Number,
+    resumeHash: String,
     jobDescription: {
       type: String,
       trim: true,
@@ -58,6 +65,8 @@ const analysisSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+analysisSchema.index({ user: 1, job: 1, resumeHash: 1, jobVersion: 1 });
 
 const Analysis = mongoose.model('Analysis', analysisSchema);
 export default Analysis;

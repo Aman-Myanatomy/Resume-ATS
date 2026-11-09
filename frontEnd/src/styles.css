@@ -1,18 +1,71 @@
+/*
+ * Theme tokens. Light values live on :root; dark values on [data-theme="dark"].
+ * index.html sets data-theme before the app loads (from the saved preference or the OS),
+ * and the ThemeController keeps it in sync with the Redux ui.theme setting.
+ */
 :root {
+  color-scheme: light;
   --ink: #17211d;
+  --ink-soft: #2b3631;
   --muted: #6b756f;
   --paper: #f5f7f2;
   --surface: #fff;
+  --field: #fbfcf9;
+  --tint: #eef4ea;
   --line: #dfe5dc;
-  --green: #356b56;
+  --line-strong: #b9c8b5;
+  --green: #356b56;          /* accent for text, icons, focus rings */
+  --brand: #356b56;          /* filled brand panels with white text */
+  --brand-bright: #356b56;   /* bars, progress, highlighted borders */
   --lime: #c8e66b;
   --coral: #ef735f;
   --yellow: #f5d779;
   --score-green: #10b981;
   --score-yellow: #f59e0b;
   --score-red: #ef4444;
+  --track: #edf1ec;
+  --good: #157a4f;  --good-bg: #e6f6ee;  --good-line: #a7f3d0;
+  --warn: #8a5a08;  --warn-bg: #fdf3dc;  --warn-line: #f4d88a;
+  --bad: #b8402f;   --bad-bg: #fdecea;   --bad-line: #f5c7be;
+  --info: #2d5b9a;  --info-bg: #e8f0fb;
+  --purple: #5b3d99; --purple-bg: #efe8fb;
+  --neutral-bg: #f1f1ef; --neutral-strong: #7d7d78;
+  --inverse-bg: #17211d; --inverse-fg: #fff; --inverse-hover: #2a3832; --inverse-muted: #c9d3cc;
+  --shadow: 0 1px 2px rgba(23, 33, 29, .04), 0 8px 24px -16px rgba(23, 33, 29, .18);
   --scrollbar-thumb: #c8d3c5;
   --scrollbar-thumb-hover: #98aa95;
+  /* Side spacing for every page: 16px on phones, growing to at most 32px on big screens. */
+  --page-gutter: clamp(16px, 2.4vw, 32px);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #e3ebe5;
+  --ink-soft: #c9d4cd;
+  --muted: #94a39b;
+  --paper: #0e1411;
+  --surface: #151d19;
+  --field: #111915;
+  --tint: #1a2a22;
+  --line: #26332c;
+  --line-strong: #3a4a41;
+  --green: #7cc4a0;
+  --brand: #2c5c49;
+  --brand-bright: #5fb48c;
+  --lime: #c8e66b;
+  --coral: #f0806d;
+  --yellow: #e8c968;
+  --track: #24302a;
+  --good: #6fd3a0;  --good-bg: #12291f;  --good-line: #1f4a36;
+  --warn: #f0c062;  --warn-bg: #2c2311;  --warn-line: #5a4518;
+  --bad: #f29482;   --bad-bg: #2e1714;   --bad-line: #5c2c25;
+  --info: #8db4ea;  --info-bg: #16233a;
+  --purple: #b9a2ee; --purple-bg: #241a3a;
+  --neutral-bg: #20262a; --neutral-strong: #5f6b66;
+  --inverse-bg: #e3ebe5; --inverse-fg: #0e1411; --inverse-hover: #ffffff; --inverse-muted: #44524a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -16px rgba(0, 0, 0, .6);
+  --scrollbar-thumb: #2f3d36;
+  --scrollbar-thumb-hover: #46574e;
 }
 
 * {
@@ -80,7 +133,7 @@ p {
   background: var(--lime);
   display: grid;
   place-items: center;
-  color: var(--ink);
+  color: #17211d; /* always dark on lime, in both themes */
   font: 700 17px 'Space Grotesk'
 }
 
@@ -104,7 +157,7 @@ textarea {
   display: block;
   width: 100%;
   border: 1px solid var(--line);
-  background: #fbfcf9;
+  background: var(--field);
   border-radius: 7px;
   padding: 14px 15px;
   outline: 0;
@@ -112,10 +165,13 @@ textarea {
   margin-top: 8px
 }
 
+/* One focus style for every form field: accent border plus a soft ring, no extra outline. */
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
+  outline: none;
   border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(53, 107, 86, .1)
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 22%, transparent)
 }
 
 .primary-button,
@@ -153,22 +209,30 @@ textarea:focus {
 }
 
 .error {
-  background: #fff0ed;
-  color: #b74e3d;
-  border: 1px solid #f5c7be;
+  background: var(--bad-bg);
+  color: var(--bad);
+  border: 1px solid var(--bad-line);
   border-radius: 6px;
   padding: 10px 12px;
   font-size: 13px
 }
 
 .content {
-  max-width: 1080px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 70px 5% 50px
+  padding: 48px var(--page-gutter) 48px
 }
 
 .intro-copy {
   color: var(--muted);
   line-height: 1.6;
   max-width: 510px
+}
+/* Respect the OS "reduce motion" setting everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
 }
